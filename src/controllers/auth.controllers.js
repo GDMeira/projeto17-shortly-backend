@@ -7,22 +7,17 @@ export async function signup(req, res) {
     password = bcrypt.hashSync(password, 10);
 
     try {
-        await db.query(`
+        const answer = await db.query(`
             INSERT INTO users (name, email, password)
             VALUES ($1, $2, $3)
+            ON CONFLICT (email) DO NOTHING
+            RETURNING id;
         `, [name, email, password]);
+        if (!answer) return res.status(409).send({message: 'Email já cadastrado.'});
 
         res.sendStatus(201);
     } catch (error) {
-        switch (error.code) {
-            case '23505':
-                res.status(409).send({message: 'email já cadastrado'});
-                break;
-        
-            default:
-                res.status(500).send(error);
-                break;
-        }
+        res.status(500).send({message: error.message});
     }
 }
 
@@ -32,7 +27,7 @@ export async function signin(req, res) {
 
     try {
         user = await db.query(`
-                SELECT users.email, users.password
+                SELECT users.email, users.password, users.id
                 FROM users
                 WHERE email = $1
             `, [email]);
