@@ -75,11 +75,14 @@ export async function userInfo(req, res) {
 export async function getRank(req, res) {
     try {
         const user = await db.query(`
-                SELECT JSON_AGG(JSON_BUILD_OBJECT('id', us.id,'name', us.name, 'linksCount', COUNT(ur.url), 'visitCount', SUM(ur.visit_count)))
+                SELECT JSON_AGG(JSON_BUILD_OBJECT('id', us.id,'name', us.name, 'linksCount', count_ur, 'visitCount', sum_visit_count))
                 FROM users AS us
-                LEFT JOIN urls as ur ON us.id = ur.user_id
-                GROUP BY us.id
-                ORDER BY "visitCount"
+                LEFT JOIN (
+                    SELECT user_id, COUNT(ur) AS count_ur, SUM(ur.visit_count) AS sum_visit_count
+                    FROM urls
+                    GROUP BY user_id
+                ) as ur ON us.id = ur.user_id
+                ORDER BY sum_visit_count
                 LIMIT 10;
             `, [res.locals.userId]);
 
