@@ -13,7 +13,7 @@ export async function signup(req, res) {
             ON CONFLICT (email) DO NOTHING
             RETURNING id;
         `, [name, email, password]);
-        if (!answer) return res.status(409).send({message: 'Email já cadastrado.'});
+        if (answer.rowCount === 0) return res.status(409).send({message: 'Email já cadastrado.'});
 
         res.sendStatus(201);
     } catch (error) {
