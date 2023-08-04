@@ -71,7 +71,7 @@ export async function deleteUrl(req, res) {
             WHERE id = $1;
         `, [id]);
         if (info.rowCount === 0) return res.status(404).send({message: 'url não cadastrada.'});
-        if (info.rows[0].user_id !== res.locals.userId) return res.status(401).send({message: 'Acesso negado.'});
+        if (info.rows[0].user_id !== Number(res.locals.userId)) return res.status(401).send({message: 'Acesso negado.'});
 
         await db.query(`
             DELETE FROM urls
