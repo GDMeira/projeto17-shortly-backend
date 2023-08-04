@@ -59,11 +59,30 @@ export async function userInfo(req, res) {
     try {
         const user = await db.query(`
                 SELECT us.id, us.name, SUM(ur.visit_count) AS "visitCount",
-                JSON_AGG('id', ur.id,'shortUrl', ur.short_url, 'url', ur.url, 'visitCount',ur.visit_count) AS "shortenedUrls"
+                JSON_AGG(JSON_BUILD_OBJECT('id', ur.id,'shortUrl', ur.short_url, 'url', ur.url, 'visitCount',ur.visit_count)) AS "shortenedUrls"
                 FROM users AS us
                 LEFT JOIN urls as ur ON us.id = ur.user_id
-                WHERE us.id = $1
+                WHERE us.id = $1;
             `, [res.locals.userId]);
+
+        res.send(user.rows[0]);
+    } catch (error) {
+        res.status(500).send({message: error.message})
+    }
+}
+
+export async function getRank(req, res) {
+    try {
+        const user = await db.query(`
+                SELECT JSON_AGG(JSON_BUILD_OBJECT('id', us.id,'name', us.name, 'linksCount', SUM(ur), 'visitCount', SUM(ur.visit_count)))
+                FROM users AS us
+                LEFT JOIN urls as ur ON us.id = ur.user_id
+                GROUP BY us.id
+                ORDER BY "visitCount"
+                LIMIT 10;
+            `, [res.locals.userId]);
+
+        res.send(user.rows[0]);
     } catch (error) {
         res.status(500).send({message: error.message})
     }
