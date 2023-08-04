@@ -54,3 +54,17 @@ export async function signin(req, res) {
         res.status(500).send({message: error.message});
     }
 }
+
+export async function userInfo(req, res) {
+    try {
+        const user = await db.query(`
+                SELECT us.id, us.name, SUM(ur.visit_count) AS "visitCount",
+                JSON_AGG('id', ur.id,'shortUrl', ur.short_url, 'url', ur.url, 'visitCount',ur.visit_count) AS "shortenedUrls"
+                FROM users AS us
+                LEFT JOIN urls as ur ON us.id = ur.user_id
+                WHERE us.id = $1
+            `, [res.locals.userId]);
+    } catch (error) {
+        res.status(500).send({message: error.message})
+    }
+}
