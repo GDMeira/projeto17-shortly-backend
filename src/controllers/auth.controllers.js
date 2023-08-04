@@ -62,7 +62,8 @@ export async function userInfo(req, res) {
                 JSON_AGG(JSON_BUILD_OBJECT('id', ur.id,'shortUrl', ur.short_url, 'url', ur.url, 'visitCount',ur.visit_count)) AS "shortenedUrls"
                 FROM users AS us
                 LEFT JOIN urls as ur ON us.id = ur.user_id
-                WHERE us.id = $1;
+                WHERE us.id = $1
+                GROUP BY us.id;
             `, [res.locals.userId]);
 
         res.send(user.rows[0]);
