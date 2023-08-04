@@ -83,7 +83,7 @@ export async function getRank(req, res) {
             LIMIT 10;
             `);
 
-        res.send(user.rows[0]);
+        res.send(user.rows);
     } catch (error) {
         res.status(500).send({message: error.message})
     }
