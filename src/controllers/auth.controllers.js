@@ -81,7 +81,7 @@ export async function getRank(req, res) {
             GROUP BY us.id
             ORDER BY COALESCE(SUM(ur.visit_count), 0) DESC
             LIMIT 10;
-            `, [res.locals.userId]);
+            `);
 
         res.send(user.rows[0]);
     } catch (error) {
