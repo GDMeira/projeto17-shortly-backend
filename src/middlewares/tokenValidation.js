@@ -6,7 +6,8 @@ export async function tokenValidation(req, res, next) {
 
     try {
         const session = await db.query(`
-            SELECT * FROM sessions
+            SELECT id, user_id AS "userId", token 
+            FROM sessions
             WHERE token = $1;
         `, [token]);
         if (session.rowCount === 0) return res.status(401).send({message: 'Token inválido.'})

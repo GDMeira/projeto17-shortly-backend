@@ -4,7 +4,6 @@ import db from '../database/database.connection.js';
 export async function shorten(req, res) {
     const nanoid = customAlphabet(urlAlphabet, 10);
     const shortUrl = nanoid(8);
-    const userId = res.locals.user_id;
 
     try {
         let id = await db.query(`
@@ -12,7 +11,7 @@ export async function shorten(req, res) {
             VALUES ($1, $2, $3)
             ON CONFLICT (url) DO NOTHING
             RETURNING id;
-            `, [req.body.url, shortUrl, userId]);
+            `, [req.body.url, shortUrl, res.locals.userId]);
         if (!id) return res.status(409).send({message: 'url já cadastrada.'});
 
         id = id.rows[0].id;
@@ -27,8 +26,8 @@ export async function getShorturlById(req, res) {
 
     try {
         const info = await db.query(`
-            SELECT u.id, u.short_url AS "shortUrl", u.url 
-            FROM urls AS u
+            SELECT id, short_url AS "shortUrl", url 
+            FROM urls
             WHERE id = $1;
         `, [id]);
         if (info.rowCount === 0) return res.status(404).send({message: 'url não cadastrada.'});
@@ -57,6 +56,29 @@ export async function redirect(req, res) {
         `, [info.rows[0].id]);
 
         res.redirect(info.rows[0].url);
+    } catch (error) {
+        res.status(500).send({message: error.message});  
+    }
+}
+
+export async function deleteUrl(req, res) {
+    const id = req.params.id;
+
+    try {
+        const info = await db.query(`
+            SELECT id, user_id AS "userId" AS "shortUrl", url 
+            FROM urls
+            WHERE id = $1;
+        `, [id]);
+        if (info.rowCount === 0) return res.status(404).send({message: 'url não cadastrada.'});
+        if (info.rows[0].user_id !== res.locals.userId) return res.status(401).send({message: 'Acesso negado.'});
+
+        await db.query(`
+            DELETE FROM urls
+            WHERE id = $1;
+        `, [id]);
+
+        res.sendStatus(204);
     } catch (error) {
         res.status(500).send({message: error.message});  
     }
