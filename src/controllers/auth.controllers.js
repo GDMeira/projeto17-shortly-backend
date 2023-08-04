@@ -75,7 +75,7 @@ export async function userInfo(req, res) {
 export async function getRank(req, res) {
     try {
         const user = await db.query(`
-                SELECT JSON_AGG(JSON_BUILD_OBJECT('id', us.id,'name', us.name, 'linksCount', SUM(ur.url), 'visitCount', SUM(ur.visit_count)))
+                SELECT JSON_AGG(JSON_BUILD_OBJECT('id', us.id,'name', us.name, 'linksCount', COUNT(ur.url), 'visitCount', SUM(ur.visit_count)))
                 FROM users AS us
                 LEFT JOIN urls as ur ON us.id = ur.user_id
                 GROUP BY us.id
