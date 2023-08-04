@@ -78,7 +78,7 @@ export async function getRank(req, res) {
                 SELECT JSON_AGG(JSON_BUILD_OBJECT('id', us.id,'name', us.name, 'linksCount', count_ur, 'visitCount', sum_visit_count))
                 FROM users AS us
                 LEFT JOIN (
-                    SELECT user_id, COUNT(ur) AS count_ur, SUM(ur.visit_count) AS sum_visit_count
+                    SELECT user_id, COUNT(ur.url) AS count_ur, SUM(ur.visit_count) AS sum_visit_count
                     FROM urls
                     GROUP BY user_id
                 ) as ur ON us.id = ur.user_id
