@@ -66,7 +66,7 @@ export async function deleteUrl(req, res) {
 
     try {
         const info = await db.query(`
-            SELECT id, user_id AS "userId" AS "shortUrl", url 
+            SELECT id, user_id AS "userId"
             FROM urls
             WHERE id = $1;
         `, [id]);
