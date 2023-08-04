@@ -21,3 +21,26 @@ export async function shorten(req, res) {
         res.status(500).send({message: error.message});
     }
 }
+
+export async function getShorturlById(req, res) {
+    const id = req.params.id;
+
+    try {
+        const info = await db.query(`
+            SELECT u.id, u.short_url AS "shortUrl", u.url 
+            FROM urls AS u
+            WHERE id = $1;
+        `, [id]);
+        if (info.rowCount === 0) return res.status(404).send({message: 'url não cadastrada.'});
+
+        await db.query(`
+            UPDATE urls
+            SET visit_count = visit_count + 1
+            WHERE id = $1;
+        `, [id]);
+
+        res.send(info.rows[0]);
+    } catch (error) {
+        res.status(500).send({message: error.message});  
+    }
+}
