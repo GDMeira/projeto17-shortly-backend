@@ -162,6 +162,7 @@ INSERT INTO public.urls VALUES (46, 2, 'https://chat.openai.com/c/1f29e092-1c76-
 INSERT INTO public.urls VALUES (50, 2, 'https://chat.openai.com/c/1f29e092-1c76-435f-8824-a0d919ead5f6913450001', '3Lu1debL', 1, '2023-08-03 00:59:36.883216');
 INSERT INTO public.urls VALUES (51, 2, 'https://chat.openai.com/c/1f29e092-1c76-435f-8824-a0d919ead5f69134500011', 'QK6kdOcr', 1, '2023-08-03 01:04:38.697376');
 INSERT INTO public.urls VALUES (1, 2, 'https://chat.openai.com/c/1f29e092-1c76-435f-8824-a0d919ead5f6', 'NT7V3722', 3, '2023-08-03 00:43:32.808377');
+INSERT INTO public.urls VALUES (52, 3, 'https://google.com', '1E2D34-v', 100, '2023-08-04 10:31:15.368996');
 
 
 --
@@ -186,7 +187,7 @@ SELECT pg_catalog.setval('public.sessions_id_seq', 3, true);
 -- Name: urls_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public.urls_id_seq', 51, true);
+SELECT pg_catalog.setval('public.urls_id_seq', 52, true);
 
 
 --
@@ -242,6 +243,14 @@ ALTER TABLE ONLY public.users
 
 ALTER TABLE ONLY public.users
     ADD CONSTRAINT users_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: sessions products_fk0; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.sessions
+    ADD CONSTRAINT products_fk0 FOREIGN KEY (user_id) REFERENCES public.users(id);
 
 
 --
