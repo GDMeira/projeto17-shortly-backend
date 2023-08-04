@@ -79,7 +79,7 @@ export async function getRank(req, res) {
                 FROM users AS us
                 LEFT JOIN (
                     SELECT user_id, COUNT(ur.url) AS count_ur, SUM(ur.visit_count) AS sum_visit_count
-                    FROM urls
+                    FROM urls AS ur
                     GROUP BY user_id
                 ) as ur ON us.id = ur.user_id
                 ORDER BY sum_visit_count
