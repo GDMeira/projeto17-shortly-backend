@@ -33,13 +33,30 @@ export async function getShorturlById(req, res) {
         `, [id]);
         if (info.rowCount === 0) return res.status(404).send({message: 'url não cadastrada.'});
 
+        res.send(info.rows[0]);
+    } catch (error) {
+        res.status(500).send({message: error.message});  
+    }
+}
+
+export async function redirect(req, res) {
+    const shortUrl = req.params.shortUrl;
+
+    try {
+        const info = await db.query(`
+            SELECT url, id
+            FROM urls
+            WHERE short_url = $1;
+        `, [shortUrl]);
+        if (info.rowCount === 0) return res.status(404).send({message: 'url não cadastrada.'});
+
         await db.query(`
             UPDATE urls
             SET visit_count = visit_count + 1
             WHERE id = $1;
-        `, [id]);
+        `, [info.rows[0].id]);
 
-        res.send(info.rows[0]);
+        res.redirect(info.rows[0].url);
     } catch (error) {
         res.status(500).send({message: error.message});  
     }
